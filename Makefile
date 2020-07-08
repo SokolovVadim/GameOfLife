@@ -1,5 +1,5 @@
-CC=g++
-INC=-I/include
+CC=mpic++
+INC=-I./include
 all:
 	$(CC) $(INC) -c src/test.cpp
 	$(CC) test.o -o a.out -lsfml-graphics -lsfml-window -lsfml-system
