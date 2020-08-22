@@ -28,6 +28,7 @@ namespace Engine
     };
 
     void root_routine();
+    void client_routine();
 
 };
 

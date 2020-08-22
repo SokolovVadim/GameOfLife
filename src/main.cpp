@@ -1,6 +1,7 @@
 #include <iostream>
 #include <mpi.h>
 #include "engine.hpp"
+#include "matrix.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -20,9 +21,9 @@ int main(int argc, char* argv[])
     {
         Engine::root_routine();
     }
-    else
+    else // client
     {
-
+        Engine::client_routine();
     }
 
     MPI_Finalize();

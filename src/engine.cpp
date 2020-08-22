@@ -2,6 +2,7 @@
 // Created by vadim on 21.08.20.
 //
 
+#include <iostream>
 #include "engine.hpp"
 
 
@@ -32,9 +33,11 @@ namespace Engine
     void root_routine()
     {
         render_graphics();
+    }
 
-        
-
+    void client_routine()
+    {
+        std::cout << "I'm client" << std::endl;
     }
 
 
