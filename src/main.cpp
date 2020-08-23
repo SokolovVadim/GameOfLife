@@ -19,6 +19,9 @@ int main(int argc, char* argv[])
 
     if(rank == 0) // root
     {
+        Engine::Matrix Matrix(5, 5);
+        Matrix.init_state();
+        Matrix.print();
         Engine::root_routine();
     }
     else // client
