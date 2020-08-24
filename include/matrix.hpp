@@ -13,10 +13,12 @@ namespace Engine
     {
     public:
         Matrix(uint32_t dimx, uint32_t dimy);
-        int8_t& operator()(uint32_t x, uint32_t y);
+        int32_t& operator()(uint32_t x, uint32_t y);
         void print();
+        void init_state();
+        uint32_t get_dimx() const;
     private:
-        std::vector<int8_t> inner_;
+        std::vector<int32_t> inner_;
         uint32_t dimx_, dimy_;
     };
 }

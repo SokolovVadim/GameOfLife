@@ -4,7 +4,8 @@
 
 #include <iostream>
 #include "engine.hpp"
-
+#include "matrix.hpp"
+#include "mpi.h"
 
 
 namespace Engine
@@ -30,14 +31,59 @@ namespace Engine
         }
 
     }
-    void root_routine()
+
+    int* get_buf(Matrix & matrix, int line_num)
     {
-        render_graphics();
+        int dimx = matrix.get_dimx();
+        auto line = new int[dimx];
+        for(int i(0); i < dimx; ++i)
+        {
+            line[i] = matrix(uint32_t(line_num), i);
+        }
     }
 
-    void client_routine()
+    void send_data(Matrix& matrix, int proc_num, int step)
+    {
+        if(step == 0) // initial state
+        {
+            // snd line in cicle
+
+            for(int i(1); i < proc_num; ++i)
+            {
+                int tag(0), count(1);
+                std::cout << "from root" << std::endl;
+                int* buf = get_buf(matrix, i - 1);
+                MPI_Send(&i, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+            }
+        }
+        else
+        {
+
+        }
+    }
+
+    void root_routine(Matrix& matrix, int proc_num)
+    {
+        int step(0);
+        std::cout << "proc num = " << proc_num << std::endl;
+        send_data(matrix, proc_num, step);
+        step++;
+        // render_graphics();
+    }
+
+    void client_routine(int proc_num)
     {
         std::cout << "I'm client" << std::endl;
+
+        // recv data from root
+
+
+            int buf(0), tag(0), count(1);
+            MPI_Status status{};
+            MPI_Recv(&buf, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+            std::cout << "buf: " << buf << std::endl;
+
+
     }
 
 

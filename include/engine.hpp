@@ -27,8 +27,10 @@ namespace Engine
         // image, texture, sprite
     };
 
-    void root_routine();
-    void client_routine();
+    class Matrix;
+
+    void root_routine(Matrix& matrix, int proc_num);
+    void client_routine(int proc_num);
 
 };
 

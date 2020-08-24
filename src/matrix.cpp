@@ -55,4 +55,9 @@ namespace Engine
             for(uint32_t j(0); j < dimy_; ++j)
                 this->operator()(i, j) = uniform_dist(e1);
     }
+
+    uint32_t Matrix::get_dimx() const
+    {
+        return this->dimx_;
+    }
 }

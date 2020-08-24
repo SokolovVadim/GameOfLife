@@ -12,21 +12,22 @@ int main(int argc, char* argv[])
     if(error)
         std::cerr << "MPI_Init crashed!" << std::endl;
 
-    int size(0), rank(0);
+    int proc_num(0), rank(0);
 
-    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_size(MPI_COMM_WORLD, &proc_num);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     if(rank == 0) // root
     {
         Engine::Matrix Matrix(5, 5);
         Matrix.init_state();
-        Matrix.print();
-        Engine::root_routine();
+        // Matrix.print();
+
+        Engine::root_routine(Matrix, proc_num);
     }
     else // client
     {
-        Engine::client_routine();
+        Engine::client_routine(proc_num);
     }
 
     MPI_Finalize();
