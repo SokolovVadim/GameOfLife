@@ -19,9 +19,9 @@ int main(int argc, char* argv[])
 
     if(rank == 0) // root
     {
-        Engine::Matrix Matrix(5, 5);
+        Engine::Matrix Matrix(uint32_t(proc_num - 1), uint32_t(proc_num - 1));
         Matrix.init_state();
-        // Matrix.print();
+        Matrix.print();
 
         Engine::root_routine(Matrix, proc_num);
     }

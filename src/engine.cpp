@@ -38,7 +38,42 @@ namespace Engine
         auto line = new int[dimx];
         for(int i(0); i < dimx; ++i)
         {
-            line[i] = matrix(uint32_t(line_num), i);
+            line[i] = matrix(uint32_t(line_num), uint32_t(i));
+        }
+        return line;
+    }
+
+    void send_to_neigbour(Matrix & matrix)
+    {
+        int dimx = matrix.get_dimx();
+        int proc_num = dimx + 1;
+        int count(dimx), tag(0);
+        for(int i(0); i < dimx; ++i)
+        {
+            if(i == 0)
+            {
+                // snd to proc_num - 1, 1, 2
+                int* buf = get_buf(matrix, i);
+                MPI_Send(buf, count, MPI_INT, i + 1,        tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, i + 2,        tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, proc_num - 1, tag, MPI_COMM_WORLD);
+            }
+            else if(i == proc_num - 1)
+            {
+                // snd to 1, proc_num - 2, proc_num - 1
+                int* buf = get_buf(matrix, i);
+                MPI_Send(buf, count, MPI_INT, 1,            tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, proc_num - 2, tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, proc_num - 1, tag, MPI_COMM_WORLD);
+            }
+            else
+            {
+                // snd to i, i + 1, i + 2
+                int* buf = get_buf(matrix, i);
+                MPI_Send(buf, count, MPI_INT, i,     tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, i + 1, tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, i + 2, tag, MPI_COMM_WORLD);
+            }
         }
     }
 
@@ -46,17 +81,24 @@ namespace Engine
     {
         if(step == 0) // initial state
         {
-            // snd line in cicle
+            // snd line in cycle
 
             for(int i(1); i < proc_num; ++i)
             {
-                int tag(0), count(1);
-                std::cout << "from root" << std::endl;
+                int tag(0), count(matrix.get_dimx());
+
+                // send dimx
+
+                MPI_Send(&count, 1, MPI_INT, i, tag, MPI_COMM_WORLD);
+
+                // send line
+
+                // std::cout << "from root" << std::endl;
                 int* buf = get_buf(matrix, i - 1);
-                MPI_Send(&i, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
             }
         }
-        else
+        else //
         {
 
         }
@@ -65,23 +107,39 @@ namespace Engine
     void root_routine(Matrix& matrix, int proc_num)
     {
         int step(0);
-        std::cout << "proc num = " << proc_num << std::endl;
+        // std::cout << "proc num = " << proc_num << std::endl;
         send_data(matrix, proc_num, step);
         step++;
         // render_graphics();
     }
 
+    void recv_data(int proc_num)
+    {
+        
+    }
+
     void client_routine(int proc_num)
     {
-        std::cout << "I'm client" << std::endl;
+        // std::cout << "I'm client" << std::endl;
 
-        // recv data from root
+        // receive data from root
 
 
-            int buf(0), tag(0), count(1);
-            MPI_Status status{};
-            MPI_Recv(&buf, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
-            std::cout << "buf: " << buf << std::endl;
+        int tag(0), count(0);
+        MPI_Status status{};
+
+        // receive dimx
+
+        MPI_Recv(&count, 1, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+        std::string msg = "count " + std::to_string(count) + "\n";
+        // std::cout << msg;
+        auto buf = new int[count];
+
+        MPI_Recv(buf, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+
+        // update
+
+        // send data to neighbour
 
 
     }
