@@ -41,7 +41,10 @@ namespace Engine
 
     void Matrix::fill_matrix(int* line, uint32_t line_num)
     {
-        
+        for(uint32_t i(0); i < dimx_; ++i)
+        {
+            this->operator()(line_num, i) = line[i];
+        }
     }
 
     void Matrix::init_state()
