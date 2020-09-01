@@ -32,6 +32,24 @@ namespace Engine
 
     }
 
+    void recv_up_to_date_data(Matrix & matrix)
+    {
+        int dimx = matrix.get_dimx();
+        int proc_num = dimx + 1;
+        auto line = new int[dimx];
+        int tag(0), count(dimx);
+        MPI_Status status{};
+        for(int i(1); i < proc_num; ++i)
+        {
+            // receive line from proc i
+
+            MPI_Recv(line, count, MPI_INT, i, tag, MPI_COMM_WORLD, &status);
+
+            // write line to matrix
+
+        }
+    }
+
     int* get_buf(Matrix & matrix, int line_num)
     {
         int dimx = matrix.get_dimx();
@@ -41,6 +59,41 @@ namespace Engine
             line[i] = matrix(uint32_t(line_num), uint32_t(i));
         }
         return line;
+    }
+
+    void send_to_process(Matrix & matrix)
+    {
+        int dimx = matrix.get_dimx();
+        int proc_num = dimx + 1;
+        int count(dimx), tag(0);
+        for(int i(1); i < proc_num; ++i)
+        {
+            if (i == 1) {
+                // snd lines 0, 1, dimx - 1 to proc number 1
+                int *buf = get_buf(matrix, i - 1);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                buf = get_buf(matrix, i);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                buf = get_buf(matrix, dimx - 1);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+            } else if (i == proc_num - 1) {
+                // snd lines 0, dimx - 2, dimx - 1 to proc number proc_num - 1
+                int *buf = get_buf(matrix, 0);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                buf = get_buf(matrix, dimx - 2);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                buf = get_buf(matrix, dimx - 1);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+            } else {
+                // snd lines i - 2, i - 1, i to proc number i
+                int *buf = get_buf(matrix, i - 2);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                buf = get_buf(matrix, i - 1);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                buf = get_buf(matrix, i);
+                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+            }
+        }
     }
 
     void send_to_neigbour(Matrix & matrix)
@@ -115,7 +168,7 @@ namespace Engine
 
     void recv_data(int proc_num)
     {
-        
+
     }
 
     void client_routine(int proc_num)

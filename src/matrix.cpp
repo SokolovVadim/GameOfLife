@@ -39,6 +39,11 @@ namespace Engine
         }
     }
 
+    void Matrix::fill_matrix(int* line, uint32_t line_num)
+    {
+        
+    }
+
     void Matrix::init_state()
     {
         srand(unsigned(time(nullptr)));
