@@ -8,13 +8,22 @@
 #include "mpi.h"
 
 
-namespace Engine
-{
-    void render_graphics()
+namespace Engine {
+    // void draw(sf::RenderWindow &window, sf::Sprite &sprite, Matrix &matrix);
+
+    void render_graphics(Matrix& matrix)
     {
-        sf::RenderWindow window(sf::VideoMode(512, 512), "Game of Life");
-        sf::RectangleShape shape(sf::Vector2f(50, 50));
-        shape.setFillColor(sf::Color::Magenta);
+        sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Game of Life");
+        // sf::RectangleShape shape(sf::Vector2f(50, 50));
+        sf::Texture texture{};
+        if (!texture.loadFromFile("image.png"))
+        {
+            std::cerr << "error! Texture loading failed\n";
+        }
+        matrix.init_map(texture);
+        matrix.set_position();
+
+        // shape.setFillColor(sf::Color::Magenta);
 
         while (window.isOpen())
         {
@@ -26,7 +35,7 @@ namespace Engine
             }
 
             window.clear();
-            window.draw(shape);
+            matrix.draw(window);
             window.display();
         }
 
@@ -161,9 +170,9 @@ namespace Engine
     {
         int step(0);
         // std::cout << "proc num = " << proc_num << std::endl;
-        send_data(matrix, proc_num, step);
+        // send_data(matrix, proc_num, step);
         step++;
-        // render_graphics();
+        render_graphics(matrix);
     }
 
     void recv_data(int proc_num)
@@ -204,11 +213,6 @@ namespace Engine
     }
 
     void update()
-    {
-
-    }
-
-    void draw()
     {
 
     }

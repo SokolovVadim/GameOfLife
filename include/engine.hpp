@@ -12,13 +12,13 @@ namespace Engine
 
     enum MAP
     {
-        HEIGHT = 10,
-        WIDTH  = 10
+        HEIGHT = 512,
+        WIDTH  = 512
     };
     enum STATES
     {
-        ALIVE = 0,
-        DEAD = 1
+        DEAD = 0,
+        ALIVE = 1
     };
 
     class Cell
