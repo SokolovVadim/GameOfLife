@@ -52,7 +52,6 @@ namespace Engine {
             MPI_Recv(line, count, MPI_INT, i, tag, MPI_COMM_WORLD, &status);
 
             // write line to matrix
-
         }
     }
 
@@ -170,6 +169,7 @@ namespace Engine {
         send_data(matrix, proc_num, step);
         send_to_process(matrix);
         step++;
+        recv_up_to_date_data(matrix);
         render_graphics(matrix);
     }
 
@@ -196,7 +196,7 @@ namespace Engine {
         std::cout << msg;
     }
 
-    void recv_data(int proc_num, int rank)
+    int recv_data(int proc_num, int rank)
     {
         int tag(0), count(0);
         MPI_Status status{};
@@ -215,6 +215,19 @@ namespace Engine {
         MPI_Recv(buf2, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
 
         test_recv_data(count, rank, buf0, buf1, buf2);
+        return count;
+    }
+
+    void update()
+    {
+
+    }
+
+    void send_up_to_date_data(int* line, int count)
+    {
+        // send line from client to root
+        int tag(0);
+        MPI_Send(line, count, MPI_INT, 0, tag, MPI_COMM_WORLD);
     }
 
     void client_routine(int proc_num, int rank)
@@ -222,23 +235,18 @@ namespace Engine {
         // std::cout << "I'm client" << std::endl;
 
         // receive data from root
-        recv_data(proc_num, rank);
+        int count = recv_data(proc_num, rank);
 
+        // update line
+        update();
 
-        // update
-
-        // send data to neighbour
-
-
+        // send line to root to be printed
+        int* line{};
+        send_up_to_date_data(line, count);
     }
 
 
     void init()
-    {
-
-    }
-
-    void update()
     {
 
     }
