@@ -14,7 +14,6 @@ namespace Engine {
     void render_graphics(Matrix& matrix)
     {
         sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Game of Life");
-        // sf::RectangleShape shape(sf::Vector2f(50, 50));
         sf::Texture texture{};
         if (!texture.loadFromFile("image.png"))
         {
@@ -22,8 +21,6 @@ namespace Engine {
         }
         matrix.init_map(texture);
         matrix.set_position();
-
-        // shape.setFillColor(sf::Color::Magenta);
 
         while (window.isOpen())
         {
@@ -105,7 +102,7 @@ namespace Engine {
         }
     }
 
-    void send_to_neigbour(Matrix & matrix)
+    /*void send_to_neigbour(Matrix & matrix)
     {
         int dimx = matrix.get_dimx();
         int proc_num = dimx + 1;
@@ -137,17 +134,17 @@ namespace Engine {
                 MPI_Send(buf, count, MPI_INT, i + 2, tag, MPI_COMM_WORLD);
             }
         }
-    }
+    }*/
 
     void send_data(Matrix& matrix, int proc_num, int step)
     {
         if(step == 0) // initial state
         {
             // snd line in cycle
+            int tag(0), count(matrix.get_dimx());
 
             for(int i(1); i < proc_num; ++i)
             {
-                int tag(0), count(matrix.get_dimx());
 
                 // send dimx
 
@@ -156,8 +153,8 @@ namespace Engine {
                 // send line
 
                 // std::cout << "from root" << std::endl;
-                int* buf = get_buf(matrix, i - 1);
-                MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
+                // int* buf = get_buf(matrix, i - 1);
+                // MPI_Send(buf, count, MPI_INT, i, tag, MPI_COMM_WORLD);
             }
         }
         else //
@@ -170,34 +167,63 @@ namespace Engine {
     {
         int step(0);
         // std::cout << "proc num = " << proc_num << std::endl;
-        // send_data(matrix, proc_num, step);
+        send_data(matrix, proc_num, step);
+        send_to_process(matrix);
         step++;
         render_graphics(matrix);
     }
 
-    void recv_data(int proc_num)
+    void test_recv_data(int count, int rank, int* buf0, int* buf1, int* buf2)
     {
+        std::string msg = "---------------------------------\n";
+        msg += "rank = " + std::to_string(rank) + "\n";
 
+        for(int i(0); i < count; ++i)
+        {
+            msg += std::to_string(buf0[i]);
+        }
+        msg += '\n';
+        for(int i(0); i < count; ++i)
+        {
+            msg += std::to_string(buf1[i]);
+        }
+        msg += '\n';
+        for(int i(0); i < count; ++i)
+        {
+            msg += std::to_string(buf2[i]);
+        }
+        msg += '\n';
+        std::cout << msg;
     }
 
-    void client_routine(int proc_num)
+    void recv_data(int proc_num, int rank)
     {
-        // std::cout << "I'm client" << std::endl;
-
-        // receive data from root
-
-
         int tag(0), count(0);
         MPI_Status status{};
 
         // receive dimx
 
         MPI_Recv(&count, 1, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
-        std::string msg = "count " + std::to_string(count) + "\n";
+        // std::string msg = "count " + std::to_string(count) + "\n";
         // std::cout << msg;
-        auto buf = new int[count];
+        auto buf0 = new int[count];
+        auto buf1 = new int[count];
+        auto buf2 = new int[count];
 
-        MPI_Recv(buf, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+        MPI_Recv(buf0, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+        MPI_Recv(buf1, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+        MPI_Recv(buf2, count, MPI_INT, 0, tag, MPI_COMM_WORLD, &status);
+
+        test_recv_data(count, rank, buf0, buf1, buf2);
+    }
+
+    void client_routine(int proc_num, int rank)
+    {
+        // std::cout << "I'm client" << std::endl;
+
+        // receive data from root
+        recv_data(proc_num, rank);
+
 
         // update
 

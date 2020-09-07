@@ -30,7 +30,7 @@ namespace Engine
     class Matrix;
 
     void root_routine(Matrix& matrix, int proc_num);
-    void client_routine(int proc_num);
+    void client_routine(int proc_num, int rank);
 
 };
 

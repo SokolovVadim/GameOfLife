@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     }
     else // client
     {
-        // Engine::client_routine(proc_num);
+        Engine::client_routine(proc_num, rank);
     }
 
     MPI_Finalize();
